@@ -15,16 +15,35 @@ class MainActivity : AppCompatActivity() {
    private lateinit var binding: ActivityMainBinding
 
    private val disposables = CompositeDisposable()
+   private var lastViewState: ViewState? = null
 
    override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
       binding = ActivityMainBinding.inflate(layoutInflater)
       setContentView(binding.root)
+   }
 
+   override fun onResume() {
+      super.onResume()
       viewModel.observeViewState()
          .observeOn(AndroidSchedulers.mainThread())
-         .subscribe { viewState -> viewState.render() }
+         .subscribe { viewState ->
+            lastViewState = viewState
+            viewState.render()
+         }
          .addTo(disposables)
+   }
+
+   override fun onSaveInstanceState(outState: Bundle) {
+      lastViewState?.toBundle(outState)
+      super.onSaveInstanceState(outState)
+   }
+
+   override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+      super.onRestoreInstanceState(savedInstanceState)
+      // Restore last state if it exists
+      lastViewState = ViewState.fromBundle(savedInstanceState)
+      lastViewState?.render()
    }
 
    override fun onPause() {
