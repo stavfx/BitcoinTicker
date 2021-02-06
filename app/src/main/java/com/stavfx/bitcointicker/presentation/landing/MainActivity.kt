@@ -16,16 +16,20 @@ class MainActivity : AppCompatActivity() {
 
    private val disposables = CompositeDisposable()
    private var lastViewState: ViewState? = null
+   private var adapter: BtcAdapter? = null
 
    override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
       binding = ActivityMainBinding.inflate(layoutInflater)
       setContentView(binding.root)
+
+      adapter = BtcAdapter()
+      binding.btcViewpager.adapter = adapter
    }
 
    override fun onResume() {
       super.onResume()
-      viewModel.observeViewState()
+      viewModel.observeViewState
          .observeOn(AndroidSchedulers.mainThread())
          .subscribe { viewState ->
             lastViewState = viewState
@@ -52,8 +56,7 @@ class MainActivity : AppCompatActivity() {
    }
 
    private fun ViewState.render() {
-      binding.txtBtc.text = bitCoinValue
-      binding.txtTimestamp.text = timestamp
+      adapter?.setState(this)
    }
 }
 
