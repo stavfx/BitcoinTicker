@@ -1,7 +1,9 @@
 package com.stavfx.bitcointicker.usecases
 
 import com.stavfx.bitcointicker.network.BitcoinTickerApi
+import io.reactivex.Observable
 import io.reactivex.Single
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface BitcoinValuesUseCase {
@@ -12,16 +14,23 @@ class BitcoinValuesUseCaseImpl @Inject constructor(
    api: BitcoinTickerApi
 ) : BitcoinValuesUseCase {
 
-   // This will make sure that concurrent calls will be shared, and when no call is ongoing,
-   // we'll hit the API again.
-   // However this doesn't guarantee only 1 API hit per second, as we are only preventing concurrent
-   // API calls, so if each call completes in 100ms, we'll be able to hit the api ~10 times / sec.
-   // Let's fix that in the next commit.
-   private val bitcoinValues: Single<BitcoinValues> = api.getBitcoinPrices()
-      .map { it.toEntity() }
-      .toObservable()
-      .share()
-      .firstOrError()
+   /**
+    * A hot observable that emits every 1s from first subscription until the end of time.
+    */
+   private val interval = Observable.interval(0, 1, TimeUnit.SECONDS)
+      .publish()
+      .autoConnect()
+
+   // Waits for `interval` to emit before making an api request (which only happens once / second)
+   // Then all the calls that came in while waiting are sharing the same response.
+   private val bitcoinValues: Single<BitcoinValues> =
+      interval
+         .firstOrError()
+         .flatMap { api.getBitcoinPrices() }
+         .map { it.toEntity() }
+         .toObservable()
+         .share()
+         .firstOrError()
 
    override fun getBitcoinValues(): Single<BitcoinValues> {
       return bitcoinValues
