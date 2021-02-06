@@ -35,14 +35,14 @@ class MainActivity : AppCompatActivity() {
    }
 
    override fun onSaveInstanceState(outState: Bundle) {
-      lastViewState?.toBundle(outState)
+      outState.putParcelable(VIEW_STATE_KEY, lastViewState)
       super.onSaveInstanceState(outState)
    }
 
    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
       super.onRestoreInstanceState(savedInstanceState)
       // Restore last state if it exists
-      lastViewState = ViewState.fromBundle(savedInstanceState)
+      lastViewState = savedInstanceState.getParcelable(VIEW_STATE_KEY)
       lastViewState?.render()
    }
 
@@ -56,3 +56,5 @@ class MainActivity : AppCompatActivity() {
       binding.txtTimestamp.text = timestamp
    }
 }
+
+private const val VIEW_STATE_KEY = "viewState"
