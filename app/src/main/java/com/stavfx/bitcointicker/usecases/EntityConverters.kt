@@ -11,7 +11,9 @@ fun NetworkTickerResponse.toEntity(): BitcoinValues = BitcoinValues(
    listOfNotNull(
       usd?.toEntity(Currency.USD),
       cad?.toEntity(Currency.CAD),
-      aud?.toEntity(Currency.AUD)
+      aud?.toEntity(Currency.AUD),
+      brl?.toEntity(Currency.BRL),
+      chf?.toEntity(Currency.CHF),
    )
 )
 

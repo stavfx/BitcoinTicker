@@ -19,6 +19,12 @@ class NetworkTickerResponse {
 
    @SerializedName("AUD")
    var aud: NetworkBitcoinValue? = null
+
+   @SerializedName("BRL")
+   var brl: NetworkBitcoinValue? = null
+
+   @SerializedName("CHF")
+   var chf: NetworkBitcoinValue? = null
 }
 
 class NetworkBitcoinValue {

@@ -21,5 +21,7 @@ data class BitcoinValue(
 enum class Currency(@StringRes val currencyName: Int) {
    USD(R.string.usd),
    CAD(R.string.cad),
-   AUD(R.string.aud)
+   AUD(R.string.aud),
+   BRL(R.string.brl),
+   CHF(R.string.chf),
 }

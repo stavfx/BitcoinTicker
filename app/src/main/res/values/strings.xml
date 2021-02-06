@@ -4,4 +4,6 @@
    <string name="usd">USD</string>
    <string name="cad">CAD</string>
    <string name="aud">AUD</string>
+   <string name="brl">BRL</string>
+   <string name="chf">CHF</string>
 </resources>
