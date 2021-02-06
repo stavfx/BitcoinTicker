@@ -34,4 +34,5 @@ class BitcoinPricesViewModel @Inject constructor(
          }
          ViewState(pages)
       }
+      .retry() // If there's an error, we just want to try again. (Can be optimized in the future)
 }

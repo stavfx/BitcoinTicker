@@ -9,10 +9,21 @@ interface BitcoinValuesUseCase {
 }
 
 class BitcoinValuesUseCaseImpl @Inject constructor(
-   private val api: BitcoinTickerApi
+   api: BitcoinTickerApi
 ) : BitcoinValuesUseCase {
+
+   // This will make sure that concurrent calls will be shared, and when no call is ongoing,
+   // we'll hit the API again.
+   // However this doesn't guarantee only 1 API hit per second, as we are only preventing concurrent
+   // API calls, so if each call completes in 100ms, we'll be able to hit the api ~10 times / sec.
+   // Let's fix that in the next commit.
+   private val bitcoinValues: Single<BitcoinValues> = api.getBitcoinPrices()
+      .map { it.toEntity() }
+      .toObservable()
+      .share()
+      .firstOrError()
+
    override fun getBitcoinValues(): Single<BitcoinValues> {
-      return api.getBitcoinPrices()
-         .map { it.toEntity() }
+      return bitcoinValues
    }
 }
