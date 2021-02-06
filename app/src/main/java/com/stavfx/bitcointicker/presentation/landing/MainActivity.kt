@@ -3,6 +3,7 @@ package com.stavfx.bitcointicker.presentation.landing
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.stavfx.bitcointicker.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,11 +26,25 @@ class MainActivity : AppCompatActivity() {
 
       adapter = BtcAdapter()
       binding.btcViewpager.adapter = adapter
+
+      binding.btcViewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+         override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            val viewState = lastViewState ?: return
+            if (viewState.index != position) {
+               lastViewState = viewState.copy(index = position)
+            }
+         }
+      })
    }
 
    override fun onResume() {
       super.onResume()
       viewModel.observeViewState
+         .map {
+            // Carry over index from previous viewState (viewModel doesn't know about selected index)
+            it.copy(index = lastViewState?.index ?: it.index)
+         }
          .observeOn(AndroidSchedulers.mainThread())
          .subscribe { viewState ->
             lastViewState = viewState
@@ -57,6 +72,7 @@ class MainActivity : AppCompatActivity() {
 
    private fun ViewState.render() {
       adapter?.setState(this)
+      binding.btcViewpager.setCurrentItem(index, false)
    }
 }
 

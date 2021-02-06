@@ -15,7 +15,6 @@ class BtcAdapter : RecyclerView.Adapter<BtcAdapter.ViewHolder>() {
    fun setState(viewState: ViewState) {
       pages.clear()
       pages.addAll(viewState.pages)
-      // TODO restore selected index
       notifyDataSetChanged()
    }
 
